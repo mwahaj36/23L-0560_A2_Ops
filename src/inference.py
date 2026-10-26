@@ -36,7 +36,11 @@ def load_model():
     import tensorflow as tf
     path = Path(os.environ.get("MODEL_PATH", "models/champion.keras"))
     if not path.exists():
-        raise FileNotFoundError(f"Model unavailable: {path}")
+        fallback = Path("models/champion.keras")
+        if fallback.exists():
+            path = fallback
+        else:
+            raise FileNotFoundError(f"Model unavailable: {path}")
     return tf.keras.models.load_model(path)
 
 

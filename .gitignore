@@ -1,0 +1,16 @@
+.venv/
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+mlruns/
+models/
+reports/runs/*/*.keras
+reports/tuner/*/trial_*/
+reports/tuner/
+toy_curve.png
+*.db
+*.sqlite3
+toy/
+work/
+/data_extracted

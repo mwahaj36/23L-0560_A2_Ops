@@ -1,0 +1,4 @@
+{% extends "base.html" %}{% block content %}<section class="card"><span class="eyebrow">ANALYSIS RESULT</span>
+<h1>{{ result.label }}</h1><p class="confidence">{{ result.confidence }}% confidence</p>
+<p><strong>File:</strong> {{ filename }}</p><p>{{ result.warning }}</p>
+<a class="button" href="/upload">Analyze another image</a><a class="secondary" href="/history">View history</a></section>{% endblock %}

@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block content %}<section class="card"><span class="eyebrow">IMAGE ORIGIN ESTIMATE</span>
+<h1>Is this image AI-generated?</h1><p>Upload an image to see VisionGuard's estimate and confidence.</p>
+<form action="/predict" method="post" enctype="multipart/form-data"><label for="image">Choose image (JPG, PNG, WebP, GIF; up to 5 MB)</label>
+<input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" required><button type="submit">Analyze image</button></form>
+<p class="caveat">A prediction is not proof of origin. Consider context and other evidence.</p></section>{% endblock %}

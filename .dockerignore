@@ -1,0 +1,12 @@
+.git
+.venv
+.dvc/cache
+.env
+data_extracted
+reports
+docs
+toy
+work
+models
+__pycache__
+*.pyc

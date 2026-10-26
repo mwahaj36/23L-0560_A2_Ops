@@ -1,0 +1,13 @@
+FROM python:3.10-slim
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PYTHONPATH=/app/src PORT=7860 API_MODE=1 MODEL_PATH=/app/models/champion.keras
+WORKDIR /app
+COPY requirements-web-arm64.txt .
+RUN pip install --no-cache-dir -r requirements-web-arm64.txt && useradd --create-home appuser
+COPY src ./src
+COPY templates ./templates
+COPY static ./static
+RUN mkdir -p /app/models && chown -R appuser:appuser /app
+USER appuser
+EXPOSE 7860
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s CMD python -c "import urllib.request;urllib.request.urlopen('http://127.0.0.1:7860/health',timeout=3)" || exit 1
+CMD ["gunicorn", "--bind", "0.0.0.0:7860", "--workers", "1", "--timeout", "90", "app:create_app()"]

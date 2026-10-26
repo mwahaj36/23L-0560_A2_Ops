@@ -1,0 +1,7 @@
+tensorflow==2.20.0
+Pillow==12.3.0
+Flask==3.1.3
+gunicorn==26.2.0
+psycopg[binary]==3.3.6
+SQLAlchemy==2.0.55
+requests==2.34.2

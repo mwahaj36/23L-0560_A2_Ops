@@ -1,0 +1,68 @@
+{
+  "total": 975,
+  "corrupt": [],
+  "duplicate_groups": [
+    [
+      "AiArtData/AiArtData/image33.jpg",
+      "AiArtData/AiArtData/image34.jpg"
+    ]
+  ],
+  "classes": {
+    "AI": {
+      "count": 539,
+      "width": {
+        "min": 225,
+        "median": 1024,
+        "max": 6000
+      },
+      "height": {
+        "min": 135,
+        "median": 800,
+        "max": 4001
+      },
+      "bytes": {
+        "min": 11738,
+        "median": 199760,
+        "max": 5626183
+      },
+      "modes": {
+        "RGB": 489,
+        "P": 14,
+        "RGBA": 35,
+        "L": 1
+      },
+      "formats": {
+        "JPEG": 429,
+        "PNG": 110
+      }
+    },
+    "Real": {
+      "count": 436,
+      "width": {
+        "min": 183,
+        "median": 920.0,
+        "max": 8495
+      },
+      "height": {
+        "min": 158,
+        "median": 720.0,
+        "max": 7091
+      },
+      "bytes": {
+        "min": 11311,
+        "median": 144840.0,
+        "max": 10195352
+      },
+      "modes": {
+        "RGB": 407,
+        "P": 9,
+        "L": 6,
+        "RGBA": 14
+      },
+      "formats": {
+        "JPEG": 403,
+        "PNG": 33
+      }
+    }
+  }
+}

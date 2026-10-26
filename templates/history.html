@@ -1,0 +1,4 @@
+{% extends "base.html" %}{% block content %}<section class="card wide"><span class="eyebrow">AUDIT TRAIL</span><h1>Prediction history</h1>
+<div class="scroll"><table><thead><tr><th>Time (UTC)</th><th>File</th><th>Size</th><th>Prediction</th><th>Confidence</th><th>Model</th></tr></thead>
+<tbody>{% for row in rows %}<tr><td>{{ row.timestamp }}</td><td>{{ row.filename }}</td><td>{{ row.width }} × {{ row.height }}</td>
+<td>{{ row.prediction }}</td><td>{{ row.confidence }}%</td><td>{{ row.model_version }}</td></tr>{% else %}<tr><td colspan="6">No predictions yet.</td></tr>{% endfor %}</tbody></table></div></section>{% endblock %}

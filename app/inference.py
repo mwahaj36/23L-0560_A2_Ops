@@ -20,37 +20,43 @@ def load_serving_model():
             import ai_edge_litert.interpreter as litert
             _interpreter = litert.Interpreter(model_path=TFLITE_PATH)
             _interpreter.allocate_tensors()
-            print(f"[OK] LiteRT runtime loaded from: {TFLITE_PATH}")
             return _interpreter
-        except ImportError:
-            try:
-                import tflite_runtime.interpreter as tflite
-                _interpreter = tflite.Interpreter(model_path=TFLITE_PATH)
-                _interpreter.allocate_tensors()
-                print(f"[OK] TFLite runtime loaded from: {TFLITE_PATH}")
-                return _interpreter
-            except ImportError:
-                pass
+        except Exception:
+            pass
+
+        try:
+            from ai_edge_litert import interpreter
+            _interpreter = interpreter.Interpreter(model_path=TFLITE_PATH)
+            _interpreter.allocate_tensors()
+            return _interpreter
+        except Exception:
+            pass
+
+        try:
+            import tflite_runtime.interpreter as tflite
+            _interpreter = tflite.Interpreter(model_path=TFLITE_PATH)
+            _interpreter.allocate_tensors()
+            return _interpreter
+        except Exception:
+            pass
+
+        try:
+            import tensorflow as tf
+            _interpreter = tf.lite.Interpreter(model_path=TFLITE_PATH)
+            _interpreter.allocate_tensors()
+            return _interpreter
+        except Exception:
+            pass
 
     if os.path.exists(MODEL_PATH):
         try:
             import tensorflow as tf
             _model = tf.keras.models.load_model(MODEL_PATH)
-            print(f"[OK] TensorFlow model loaded from: {MODEL_PATH}")
             return _model
         except Exception:
             pass
 
-    try:
-        import tensorflow as tf
-        if os.path.exists(TFLITE_PATH):
-            _interpreter = tf.lite.Interpreter(model_path=TFLITE_PATH)
-            _interpreter.allocate_tensors()
-            return _interpreter
-    except Exception:
-        pass
-
-    raise FileNotFoundError("No valid model file or runtime could be initialized.")
+    raise FileNotFoundError("Model file not found or runtime unavailable.")
 
 def preprocess_image_bytes(image_bytes, target_size=(128, 128)):
     try:
@@ -67,7 +73,6 @@ def preprocess_image_bytes(image_bytes, target_size=(128, 128)):
 def run_inference(image_bytes, threshold=0.50):
     runner = load_serving_model()
     start_time = time.time()
-    
     tensor = preprocess_image_bytes(image_bytes)
     
     global _interpreter, _model

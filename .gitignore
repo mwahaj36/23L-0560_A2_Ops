@@ -1,0 +1,21 @@
+# Virtual Environment
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Local settings / Secrets
+.env
+.env.local
+
+# MLflow local runs (unless tracked)
+mlruns/
+.mlflow/
+
+# Data (Will be tracked by DVC)
+data/raw/
+
+# OS specific
+.DS_Store
+Thumbs.db
+

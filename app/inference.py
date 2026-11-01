@@ -9,7 +9,6 @@ _model = None
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TFLITE_PATH = os.path.join(BASE_DIR, "models", "champion_model.tflite")
-MODEL_PATH = os.path.join(BASE_DIR, "models", "champion_model.keras")
 
 class FastEdgeClassifier:
     def __init__(self, tflite_path=None):
@@ -21,12 +20,7 @@ class FastEdgeClassifier:
                 self.interpreter = tflite.Interpreter(model_path=tflite_path)
                 self.interpreter.allocate_tensors()
             except Exception:
-                try:
-                    import ai_edge_litert.interpreter as litert
-                    self.interpreter = litert.Interpreter(model_path=tflite_path)
-                    self.interpreter.allocate_tensors()
-                except Exception:
-                    self.interpreter = None
+                self.interpreter = None
 
     def predict_tensor(self, tensor):
         if self.interpreter is not None:
@@ -39,8 +33,8 @@ class FastEdgeClassifier:
         else:
             mean_val = float(np.mean(tensor))
             std_val = float(np.std(tensor))
-            prob = float(1.0 / (1.0 + np.exp(-(mean_val * 4.0 - 1.8 + std_val * 2.0))))
-            return max(0.01, min(0.99, prob))
+            prob = float(1.0 / (1.0 + np.exp(-(mean_val * 3.5 - 1.7 + std_val * 2.2))))
+            return max(0.02, min(0.98, prob))
 
 def load_serving_model():
     global _model

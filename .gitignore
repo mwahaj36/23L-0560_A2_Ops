@@ -11,6 +11,14 @@ __pycache__/
 # MLflow local runs (unless tracked)
 mlruns/
 .mlflow/
+mlflow.db
+
+# Flask instance & temp
+instance/
+tuner_results/
+toy_dvc/
+reports/dataset_audit.csv
+
 
 # Data (Will be tracked by DVC)
 data/raw/

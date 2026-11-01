@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: visionguard_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-visionguard_db}
+      POSTGRES_USER: ${POSTGRES_USER:-vg_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vg_secure_password_2026}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vg_user} -d ${POSTGRES_DB:-visionguard_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - visionguard_net
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: visionguard_app
+    ports:
+      - "5001:5001"
+    environment:
+      PORT: 5001
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-vg_user}:${POSTGRES_PASSWORD:-vg_secure_password_2026}@db:5432/${POSTGRES_DB:-visionguard_db}
+      CONFIDENCE_THRESHOLD: ${CONFIDENCE_THRESHOLD:-0.50}
+      FLASK_DEBUG: "False"
+      TFLITE_PATH: models/champion_model.tflite
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - visionguard_net
+
+volumes:
+  pgdata:
+
+networks:
+  visionguard_net:
+    driver: bridge

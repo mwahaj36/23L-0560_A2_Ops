@@ -1,0 +1,99 @@
+import io
+import os
+import time
+import numpy as np
+from PIL import Image
+
+_interpreter = None
+_model = None
+
+TFLITE_PATH = os.getenv("TFLITE_PATH", "models/champion_model.tflite")
+MODEL_PATH = os.getenv("MODEL_PATH", "models/champion_model.keras")
+
+def load_serving_model():
+    global _interpreter, _model
+    if _interpreter is not None or _model is not None:
+        return _interpreter or _model
+
+    if os.path.exists(TFLITE_PATH):
+        try:
+            import ai_edge_litert.interpreter as litert
+            _interpreter = litert.Interpreter(model_path=TFLITE_PATH)
+            _interpreter.allocate_tensors()
+            print(f"[OK] LiteRT runtime loaded from: {TFLITE_PATH}")
+            return _interpreter
+        except ImportError:
+            try:
+                import tflite_runtime.interpreter as tflite
+                _interpreter = tflite.Interpreter(model_path=TFLITE_PATH)
+                _interpreter.allocate_tensors()
+                print(f"[OK] TFLite runtime loaded from: {TFLITE_PATH}")
+                return _interpreter
+            except ImportError:
+                pass
+
+    if os.path.exists(MODEL_PATH):
+        try:
+            import tensorflow as tf
+            _model = tf.keras.models.load_model(MODEL_PATH)
+            print(f"[OK] TensorFlow model loaded from: {MODEL_PATH}")
+            return _model
+        except Exception:
+            pass
+
+    try:
+        import tensorflow as tf
+        if os.path.exists(TFLITE_PATH):
+            _interpreter = tf.lite.Interpreter(model_path=TFLITE_PATH)
+            _interpreter.allocate_tensors()
+            return _interpreter
+    except Exception:
+        pass
+
+    raise FileNotFoundError("No valid model file or runtime could be initialized.")
+
+def preprocess_image_bytes(image_bytes, target_size=(128, 128)):
+    try:
+        img = Image.open(io.BytesIO(image_bytes))
+        img.verify()
+        img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        img = img.resize(target_size)
+        img_array = np.array(img).astype("float32") / 255.0
+        img_tensor = np.expand_dims(img_array, axis=0)
+        return img_tensor
+    except Exception as e:
+        raise ValueError(f"Invalid image format or unreadable bytes: {e}")
+
+def run_inference(image_bytes, threshold=0.50):
+    runner = load_serving_model()
+    start_time = time.time()
+    
+    tensor = preprocess_image_bytes(image_bytes)
+    
+    global _interpreter, _model
+    if _interpreter is not None:
+        input_details = _interpreter.get_input_details()
+        output_details = _interpreter.get_output_details()
+        _interpreter.set_tensor(input_details[0]["index"], tensor)
+        _interpreter.invoke()
+        output_data = _interpreter.get_tensor(output_details[0]["index"])
+        pred_prob = float(output_data[0][0])
+    else:
+        pred_prob = float(_model.predict(tensor, verbose=0)[0][0])
+        
+    latency_ms = round((time.time() - start_time) * 1000, 2)
+    
+    if pred_prob >= threshold:
+        label = "AI-Generated"
+        confidence = pred_prob
+    else:
+        label = "Real"
+        confidence = 1.0 - pred_prob
+
+    return {
+        "label": label,
+        "raw_prob": pred_prob,
+        "confidence_percentage": round(confidence * 100.0, 2),
+        "latency_ms": latency_ms,
+        "model_name": "VisionGuard_MobileNetV2_Champion"
+    }

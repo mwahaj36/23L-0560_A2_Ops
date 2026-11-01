@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card history-card">
+    <div class="card-header flex-header">
+        <div>
+            <h2>Permanent Audit Trail</h2>
+            <p class="subtitle">Complete verifiable history of processed image requests stored in database.</p>
+        </div>
+        <a href="{{ url_for('main.index') }}" class="btn btn-secondary btn-sm">+ New Upload</a>
+    </div>
+
+    {% if logs %}
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Timestamp (UTC)</th>
+                    <th>Filename</th>
+                    <th>Verdict</th>
+                    <th>Confidence</th>
+                    <th>Model Deployed</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>#{{ log.id }}</td>
+                    <td>{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td class="filename-cell">{{ log.filename }}</td>
+                    <td>
+                        <span class="status-pill {% if log.prediction == 'AI-Generated' %}pill-ai{% else %}pill-real{% endif %}">
+                            {{ log.prediction }}
+                        </span>
+                    </td>
+                    <td>{{ log.confidence }}%</td>
+                    <td><span class="mono-text">{{ log.model_name }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>No queries logged yet. Upload an image to start populating the audit trail.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

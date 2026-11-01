@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card hero-card">
+    <div class="card-header">
+        <h1>VisionGuard Deep Learning Detector</h1>
+        <p class="subtitle">Upload an image to determine whether it is authentic or synthesized by generative AI models.</p>
+    </div>
+
+    <form action="{{ url_for('main.predict') }}" method="POST" enctype="multipart/form-data" class="upload-form">
+        <div class="drop-zone" id="drop-zone">
+            <div class="icon-cloud">&#9729;</div>
+            <p class="drop-text">Drag and drop your image here, or <span>browse</span></p>
+            <p class="drop-hint">Supports PNG, JPG, JPEG, WEBP (Max 5MB)</p>
+            <input type="file" name="image" id="file-input" accept=".png,.jpg,.jpeg,.webp" required>
+        </div>
+
+        <div id="file-details" class="file-details hidden">
+            <span id="selected-filename"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="submit-btn">Run AI Classification</button>
+    </form>
+</div>
+
+<script>
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const fileDetails = document.getElementById('file-details');
+    const selectedFilename = document.getElementById('selected-filename');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            selectedFilename.textContent = "Selected: " + fileInput.files[0].name;
+            fileDetails.classList.remove('hidden');
+        }
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+        });
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            selectedFilename.textContent = "Selected: " + fileInput.files[0].name;
+            fileDetails.classList.remove('hidden');
+        }
+    });
+</script>
+{% endblock %}
+
